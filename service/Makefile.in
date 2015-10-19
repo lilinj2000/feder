@@ -79,7 +79,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = multi
+subdir = service
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp $(noinst_HEADERS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -120,9 +120,13 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 libdatafeed_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 am_libdatafeed_la_OBJECTS = libdatafeed_la-DataFeedMultiOptions.lo \
-	libdatafeed_la-DataFeedMultiServiceImpl.lo
+	libdatafeed_la-DataFeedMultiServiceImpl.lo \
+	libdatafeed_la-DataFeedTCPOptions.lo \
+	libdatafeed_la-DataFeedTCPServiceImpl.lo \
+	libdatafeed_la-DataFeedSpiImpl.lo libdatafeed_la-FederUtil.lo
 libdatafeed_la_OBJECTS = $(am_libdatafeed_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -218,6 +222,9 @@ CYGPATH_W = @CYGPATH_W@
 DATAFEED_MULTI_CPPFLAGS = @DATAFEED_MULTI_CPPFLAGS@
 DATAFEED_MULTI_HOME = @DATAFEED_MULTI_HOME@
 DATAFEED_MULTI_LIBADD = @DATAFEED_MULTI_LIBADD@
+DATAFEED_TCP_CPPFLAGS = @DATAFEED_TCP_CPPFLAGS@
+DATAFEED_TCP_HOME = @DATAFEED_TCP_HOME@
+DATAFEED_TCP_LIBADD = @DATAFEED_TCP_LIBADD@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
@@ -331,13 +338,20 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 lib_LTLIBRARIES = libdatafeed.la
-libdatafeed_la_SOURCES = DataFeedMultiOptions.cc DataFeedMultiServiceImpl.cc
+libdatafeed_la_SOURCES = DataFeedMultiOptions.cc DataFeedMultiServiceImpl.cc\
+			 DataFeedTCPOptions.cc \
+			 DataFeedTCPServiceImpl.cc \
+			 DataFeedSpiImpl.cc \
+			 FederUtil.cc
+
 libdatafeed_la_CPPFLAGS = -I$(top_srcdir) \
 			$(BOOST_CPPFLAGS) \
 			$(DATAFEED_MULTI_CPPFLAGS) \
+			$(DATAFEED_TCP_CPPFLAGS) \
 			$(SOIL_CPPFLAGS)
 
 libdatafeed_la_LIBADD = $(DATAFEED_MULTI_LIBADD) \
+		$(DATAFEED_TCP_LIBADD) \
 		$(BOOST_LIBADD) \
 		$(SOIL_LIBADD)
 
@@ -351,7 +365,11 @@ libdatafeed_la_LDFLAGS = \
 noinst_HEADERS = DataFeedMultiOptions.hh \
 		 UstpApiStructPrint.hh \
 		 DataFeedMultiServiceImpl.hh \
-		 DataFeedLog.hh
+		 FederLog.hh \
+		 DataFeedTCPOptions.hh \
+		 DataFeedTCPServiceImpl.hh \
+		 DataFeedSpiImpl.hh \
+		 FederUtil.hh
 
 all: all-am
 
@@ -366,9 +384,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign multi/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign service/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign multi/Makefile
+	  $(AUTOMAKE) --foreign service/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -434,6 +452,10 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdatafeed_la-DataFeedMultiOptions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdatafeed_la-DataFeedMultiServiceImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdatafeed_la-DataFeedSpiImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdatafeed_la-DataFeedTCPOptions.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdatafeed_la-DataFeedTCPServiceImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdatafeed_la-FederUtil.Plo@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -469,6 +491,34 @@ libdatafeed_la-DataFeedMultiServiceImpl.lo: DataFeedMultiServiceImpl.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='DataFeedMultiServiceImpl.cc' object='libdatafeed_la-DataFeedMultiServiceImpl.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdatafeed_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libdatafeed_la-DataFeedMultiServiceImpl.lo `test -f 'DataFeedMultiServiceImpl.cc' || echo '$(srcdir)/'`DataFeedMultiServiceImpl.cc
+
+libdatafeed_la-DataFeedTCPOptions.lo: DataFeedTCPOptions.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdatafeed_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libdatafeed_la-DataFeedTCPOptions.lo -MD -MP -MF $(DEPDIR)/libdatafeed_la-DataFeedTCPOptions.Tpo -c -o libdatafeed_la-DataFeedTCPOptions.lo `test -f 'DataFeedTCPOptions.cc' || echo '$(srcdir)/'`DataFeedTCPOptions.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdatafeed_la-DataFeedTCPOptions.Tpo $(DEPDIR)/libdatafeed_la-DataFeedTCPOptions.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='DataFeedTCPOptions.cc' object='libdatafeed_la-DataFeedTCPOptions.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdatafeed_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libdatafeed_la-DataFeedTCPOptions.lo `test -f 'DataFeedTCPOptions.cc' || echo '$(srcdir)/'`DataFeedTCPOptions.cc
+
+libdatafeed_la-DataFeedTCPServiceImpl.lo: DataFeedTCPServiceImpl.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdatafeed_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libdatafeed_la-DataFeedTCPServiceImpl.lo -MD -MP -MF $(DEPDIR)/libdatafeed_la-DataFeedTCPServiceImpl.Tpo -c -o libdatafeed_la-DataFeedTCPServiceImpl.lo `test -f 'DataFeedTCPServiceImpl.cc' || echo '$(srcdir)/'`DataFeedTCPServiceImpl.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdatafeed_la-DataFeedTCPServiceImpl.Tpo $(DEPDIR)/libdatafeed_la-DataFeedTCPServiceImpl.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='DataFeedTCPServiceImpl.cc' object='libdatafeed_la-DataFeedTCPServiceImpl.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdatafeed_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libdatafeed_la-DataFeedTCPServiceImpl.lo `test -f 'DataFeedTCPServiceImpl.cc' || echo '$(srcdir)/'`DataFeedTCPServiceImpl.cc
+
+libdatafeed_la-DataFeedSpiImpl.lo: DataFeedSpiImpl.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdatafeed_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libdatafeed_la-DataFeedSpiImpl.lo -MD -MP -MF $(DEPDIR)/libdatafeed_la-DataFeedSpiImpl.Tpo -c -o libdatafeed_la-DataFeedSpiImpl.lo `test -f 'DataFeedSpiImpl.cc' || echo '$(srcdir)/'`DataFeedSpiImpl.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdatafeed_la-DataFeedSpiImpl.Tpo $(DEPDIR)/libdatafeed_la-DataFeedSpiImpl.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='DataFeedSpiImpl.cc' object='libdatafeed_la-DataFeedSpiImpl.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdatafeed_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libdatafeed_la-DataFeedSpiImpl.lo `test -f 'DataFeedSpiImpl.cc' || echo '$(srcdir)/'`DataFeedSpiImpl.cc
+
+libdatafeed_la-FederUtil.lo: FederUtil.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdatafeed_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libdatafeed_la-FederUtil.lo -MD -MP -MF $(DEPDIR)/libdatafeed_la-FederUtil.Tpo -c -o libdatafeed_la-FederUtil.lo `test -f 'FederUtil.cc' || echo '$(srcdir)/'`FederUtil.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdatafeed_la-FederUtil.Tpo $(DEPDIR)/libdatafeed_la-FederUtil.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='FederUtil.cc' object='libdatafeed_la-FederUtil.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdatafeed_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libdatafeed_la-FederUtil.lo `test -f 'FederUtil.cc' || echo '$(srcdir)/'`FederUtil.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

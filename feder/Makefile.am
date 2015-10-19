@@ -5,7 +5,7 @@ include_HEADERS =
 
 noinst_HEADERS = 
 
-extra_files = DataFeedMultiService.hh 
+extra_files = DataFeedMultiService.hh DataFeedTCPService.hh FederDef.hh
 
 EXTRA_DIST = $(extra_files)
 

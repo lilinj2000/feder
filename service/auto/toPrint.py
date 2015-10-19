@@ -12,7 +12,7 @@ comment_pattern = re.compile(r'''///''')
 
 field_pattern = re.compile(r'''\s(\w+)\s(\w+);''')
 
-file = open("UstpApiStruct.h")
+file = open("USTPFtdcUserApiStruct.h")
 
 struct_status = False
 struct_name = ''
@@ -21,14 +21,14 @@ object_name = ''
 tab = '    '
 first_field = False
 
-header_file = open('UstpApiStructPrint.hh', 'wb')
+header_file = open('USTPFtdcUserApiStructPrint.hh', 'wb')
 # cpp_file = open('FtdcUserApiStructPrint.cc', 'wb')
 
-header_file.write('#ifndef USTP_API_STRUCT_PRINT_HH\n')
-header_file.write('#define USTP_API_STRUCT_PRINT_HH\n\n')
+header_file.write('#ifndef USTP_FTDC_USERAPI_STRUCT_PRINT_HH\n')
+header_file.write('#define USTP_FTDC_USERAPI_STRUCT_PRINT_HH\n\n')
 
 header_file.write('#include <ostream>\n')
-header_file.write('#include "UstpApiStruct.h"\n\n')
+header_file.write('#include "USTPFtdcUserApiStruct.h"\n\n')
 
 # header_file.write('namespace ctp\n')
 # header_file.write('{\n')
@@ -43,7 +43,7 @@ for line in file:
     if result:
         # print '%s' % result.groups()
         struct_name = result.group(1)
-        object_name = 'a' + struct_name.replace('CUstp', '')
+        object_name = 'a' + struct_name.replace('CUstpFtdc', '')
         # header_file.write('std::ostream& operator<<(std::ostream&, const %s&);\n\n' % struct_name)
         header_file.write('template< typename CharT, typename TraitsT >\n')
         header_file.write('std::basic_ostream< CharT, TraitsT >& operator<<(std::basic_ostream< CharT, TraitsT >& os, %s const& %s)\n' % (struct_name, object_name))

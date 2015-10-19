@@ -639,6 +639,9 @@ LIB@&t@OBJS
 GTEST_LIBADD
 GTEST_CPPFLAGS
 GTEST_HOME
+DATAFEED_TCP_LIBADD
+DATAFEED_TCP_CPPFLAGS
+DATAFEED_TCP_HOME
 DATAFEED_MULTI_LIBADD
 DATAFEED_MULTI_CPPFLAGS
 DATAFEED_MULTI_HOME
@@ -786,6 +789,7 @@ enable_libtool_lock
 with_soil
 with_boost
 with_datafeed_multi
+with_datafeed_tcp
 with_gtest
 '
       ac_precious_vars='build_alias
@@ -1439,10 +1443,12 @@ Optional Packages:
   --with-gnu-ld           assume the C compiler uses GNU ld @<:@default=no@:>@
   --with-sysroot=DIR Search for dependent libraries within DIR
                         (or the compiler's sysroot if not specified).
-  --with-soil             home path of the soil, defaults to @S|@home_es/soil
+  --with-soil             home path of the soil, defaults to @S|@home_libs/soil
   --with-boost            home path of the boost, defaults to @S|@home_3rd/boost
   --with-datafeed-multi   home path of the datafeed, defaults to
                           @S|@home_3rd/DataFeed_Multi_API_build_20150427
+  --with-datafeed-tcp     home path of the datafeed, defaults to
+                          @S|@home_3rd/DataFeedAPI_V1.00_Build20140813
   --with-gtest            home path of the gtest, defaults to @S|@home_3rd/gtest
 
 Some influential environment variables:
@@ -15104,22 +15110,23 @@ LT_AGE=0
 
 
 home_3rd=~/3rd
-home_es=~/es
+home_libs=~/libs
 
-if test -d /app/3rd ; then
-   home_3rd=/app/3rd
+if test -d /llj/3rd ; then
+   home_3rd=/llj/3rd
 fi
 
-if test -d /app/es ; then
-   home_es=/app/es
+if test -d /llj/libs ; then
+   home_libs=/llj/libs
 fi
+
 
 
 @%:@ Check whether --with-soil was given.
 if test "${with_soil+set}" = set; then :
   withval=$with_soil; SOIL_HOME="$withval"
 else
-  SOIL_HOME="$home_es/soil"
+  SOIL_HOME="$home_libs/soil"
 fi
 
 
@@ -15167,6 +15174,20 @@ DATAFEED_MULTI_LIBADD="-L$DATAFEED_MULTI_HOME -lustpmdapi"
 
 
 
+@%:@ Check whether --with-datafeed-tcp was given.
+if test "${with_datafeed_tcp+set}" = set; then :
+  withval=$with_datafeed_tcp; DATAFEED_TCP_HOME="$withval"
+else
+  DATAFEED_TCP_HOME="$home_3rd/DataFeedAPI_V1.00_Build20140813"
+fi
+
+
+DATAFEED_TCP_CPPFLAGS="-I$DATAFEED_TCP_HOME/include"
+DATAFEED_TCP_LIBADD="-L$DATAFEED_TCP_HOME/lnx64 -lUSTPmduserapi"
+
+
+
+
 @%:@ Check whether --with-gtest was given.
 if test "${with_gtest+set}" = set; then :
   withval=$with_gtest; GTEST_HOME="$withval"
@@ -15181,7 +15202,7 @@ GTEST_LIBADD="$GTEST_HOME/lib/libgtest.a $GTEST_HOME/lib/libgtest_main.a"
 
 
 
-ac_config_files="$ac_config_files Makefile feder/Makefile multi/Makefile"
+ac_config_files="$ac_config_files Makefile feder/Makefile service/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -16307,7 +16328,7 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "feder/Makefile") CONFIG_FILES="$CONFIG_FILES feder/Makefile" ;;
-    "multi/Makefile") CONFIG_FILES="$CONFIG_FILES multi/Makefile" ;;
+    "service/Makefile") CONFIG_FILES="$CONFIG_FILES service/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

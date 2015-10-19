@@ -33,22 +33,23 @@ AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)
 
 home_3rd=~/3rd
-home_es=~/es
+home_libs=~/libs
 
-if test -d /app/3rd ; then
-   home_3rd=/app/3rd
+if test -d /llj/3rd ; then
+   home_3rd=/llj/3rd
 fi
 
-if test -d /app/es ; then
-   home_es=/app/es
+if test -d /llj/libs ; then
+   home_libs=/llj/libs
 fi
+
 
 dnl soil lib
 AC_ARG_WITH([soil],
     [AS_HELP_STRING([--with-soil],
-        [home path of the soil, defaults to $home_es/soil])],
+        [home path of the soil, defaults to $home_libs/soil])],
     [SOIL_HOME="$withval"],
-    [SOIL_HOME="$home_es/soil"])
+    [SOIL_HOME="$home_libs/soil"])
 AC_SUBST([SOIL_HOME])
 
 SOIL_CPPFLAGS="-I$SOIL_HOME/include"
@@ -89,6 +90,18 @@ DATAFEED_MULTI_LIBADD="-L$DATAFEED_MULTI_HOME -lustpmdapi"
 AC_SUBST(DATAFEED_MULTI_CPPFLAGS)
 AC_SUBST(DATAFEED_MULTI_LIBADD)
 
+dnl fema datafeed tcp lib
+AC_ARG_WITH([datafeed-tcp],
+    [AS_HELP_STRING([--with-datafeed-tcp],
+        [home path of the datafeed, defaults to $home_3rd/DataFeedAPI_V1.00_Build20140813])],
+    [DATAFEED_TCP_HOME="$withval"],
+    [DATAFEED_TCP_HOME="$home_3rd/DataFeedAPI_V1.00_Build20140813"])
+AC_SUBST([DATAFEED_TCP_HOME])
+DATAFEED_TCP_CPPFLAGS="-I$DATAFEED_TCP_HOME/include"
+DATAFEED_TCP_LIBADD="-L$DATAFEED_TCP_HOME/lnx64 -lUSTPmduserapi"
+AC_SUBST(DATAFEED_TCP_CPPFLAGS)
+AC_SUBST(DATAFEED_TCP_LIBADD)
+
 dnl gtest lib
 AC_ARG_WITH([gtest],
     [AS_HELP_STRING([--with-gtest],
@@ -105,6 +118,6 @@ AC_SUBST(GTEST_LIBADD)
 AC_OUTPUT([
 	Makefile
 	feder/Makefile
-	multi/Makefile])
+	service/Makefile])
 
 
