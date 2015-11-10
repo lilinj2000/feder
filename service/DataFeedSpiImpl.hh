@@ -54,7 +54,7 @@ class DataFeedSpiImpl : public CUstpFtdcMduserSpi
 
   DataFeedTCPServiceImpl* service_;
 
-  std::auto_ptr<FederUtil> util_;
+  std::unique_ptr<FederUtil> util_;
   
 };
 

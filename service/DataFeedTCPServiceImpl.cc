@@ -15,7 +15,7 @@ DataFeedTCPServiceImpl::DataFeedTCPServiceImpl(soil::Options* options, DataFeedT
 {
   FEDER_TRACE <<"DataFeedTCPServiceImpl::DataFeedTCPServiceImpl()" ;
 
-  cond_.reset( soil::Condition::create() );
+  cond_.reset( soil::STimer::create() );
 
   md_queue_.reset( new soil::MsgQueue<DepthMarketData, DataFeedTCPServiceImpl>(this) );
   

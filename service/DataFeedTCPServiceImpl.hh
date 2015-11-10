@@ -1,9 +1,9 @@
 #ifndef FEDER_DATAFEED_TCP_SERVICE_IMPL_HH
 #define FEDER_DATAFEED_TCP_SERVICE_IMPL_HH
 
-#include "boost/atomic.hpp"
+#include <atomic>
 
-#include "soil/Condition.hh"
+#include "soil/STimer.hh"
 #include "soil/MsgQueue.hh"
 
 #include "feder/DataFeedTCPService.hh"
@@ -52,15 +52,15 @@ class DataFeedTCPServiceImpl : public DataFeedTCPService
   
   CUstpFtdcMduserApi* md_api_;
   
-  std::auto_ptr<DataFeedSpiImpl> md_spi_;
+  std::unique_ptr<DataFeedSpiImpl> md_spi_;
 
   DataFeedTCPServiceCallback* callback_;
   
-  boost::atomic<int> request_id_;
+  std::atomic_int request_id_;
 
-  std::auto_ptr<soil::Condition> cond_;
+  std::unique_ptr<soil::STimer> cond_;
 
-  std::auto_ptr<soil::MsgQueue<DepthMarketData, DataFeedTCPServiceImpl> > md_queue_;
+  std::unique_ptr<soil::MsgQueue<DepthMarketData, DataFeedTCPServiceImpl> > md_queue_;
 };
 
 
